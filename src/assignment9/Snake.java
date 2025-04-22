@@ -11,7 +11,8 @@ public class Snake {
 	private double deltaY;
 	
 	public Snake() {
-		//FIXME - set up the segments instance variable
+		segments = new LinkedList<>();
+		segments.add(new BodySegment(0.4, 0.4, SEGMENT_SIZE));
 		deltaX = 0;
 		deltaY = 0;
 	}
@@ -37,14 +38,21 @@ public class Snake {
 	 * based on the current direction of travel
 	 */
 	public void move() {
-		//FIXME
+		BodySegment head = segments.getFirst();
+		double newHeadX = head.getX() + deltaX; //this moves the snake horizontaly
+		double newHeadY = head.getY() + deltaY; //this moves the snake vertically
+		segments.addFirst(new BodySegment(newHeadX, newHeadY, SEGMENT_SIZE)); //this creates new parts of the segment that those x,y coordinates
+		segments.removeLast(); // this takes away the final segment so it looks like the snake moved
 	}
 	
 	/**
 	 * Draws the snake by drawing each segment
 	 */
 	public void draw() {
-		//FIXME
+		segments.get(0).drawFirst();
+		for(BodySegment segment : segments) {
+			segment.draw();
+		}
 	}
 	
 	/**
@@ -53,7 +61,13 @@ public class Snake {
 	 * @return true if the snake successfully ate the food
 	 */
 	public boolean eatFood(Food f) {
-		//FIXME
+		BodySegment head = segments.getFirst(); // this is the head of the snake(1st piece)
+		double dist = Math.sqrt(Math.pow(head.getX() - f.getX(), 2) + Math.pow(head.getY() - f.getY(), 2)); // center of head vs center of food
+		if(dist < (SEGMENT_SIZE + Food.FOOD_SIZE)/2) { // if that comparison is less than the avg distance of the 2, it counts as a collision and the snake adds on a segment
+			BodySegment tail = segments.getLast();
+			segments.addLast(new BodySegment(tail.getX(), tail.getY(), SEGMENT_SIZE)); //this is the new body segment being created
+			return true;
+		}
 		return false;
 	}
 	
@@ -61,8 +75,12 @@ public class Snake {
 	 * Returns true if the head of the snake is in bounds
 	 * @return whether or not the head is in the bounds of the window
 	 */
-	public boolean isInbounds() {
-		//FIXME
-		return true;
+	public boolean isInbounds() { //how the game checks if the snake is in the bounds of the game
+		BodySegment head = segments.getFirst();
+		double headX = head.getX();
+		double headY = head.getY();
+		return headX >= 0 && headX <= 1 && headY >=0 && headY <=1; //this whole line will only allow the game to continue if all true
+		//so in game, this condition is checked and if its false then game over will appear and game ends
 	}
 }
+

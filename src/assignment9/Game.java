@@ -6,17 +6,43 @@ import edu.princeton.cs.introcs.StdDraw;
 
 public class Game {
 	
+	private Snake snake;
+	private Food food;
+	private int score; // this is my addition
+	
 	public Game() {
 		StdDraw.enableDoubleBuffering();
-		
-		//FIXME - construct new Snake and Food objects
+		this.snake = new Snake();
+		this.food = new Food();
+		this.score = 0;
 	}
 	
 	public void play() {
-		while (true) { //TODO: Update this condition to check if snake is in bounds
+		while (true) { //set initially that the snake is in bounds always
+			if(!snake.isInbounds()) { // if snake is not in bounds, you lose
+				System.out.println("YOU LOST!!");
+				StdDraw.clear();
+				StdDraw.setPenColor(200,100,0);
+				StdDraw.text(0.4, 0.4, "GAME OVER!!");
+				StdDraw.show();
+				break;
+			}
 			int dir = getKeypress();
-			//Testing only: you will eventually need to do more work here
-			System.out.println("Keypress: " + dir);
+			if(dir != -1) { //if not a not valid key was pressed, then the snake will move following the method call
+				snake.changeDirection(dir);
+			}
+			
+			snake.move(); // this updates the position of the snake, moves it to the new x,y coordinates
+			
+			if(snake.eatFood(food)) { //this is where the game detects the eating of food
+				food.move(); //if the snake is eating, it calls the move method which places new food at location x,y
+				score++;
+				System.out.println("SCORE OF GAME: " + score); // this is my part 
+				
+			}
+			
+			updateDrawing(); // this redraws the new food that was created from eatFood and new position of the snake 
+			StdDraw.pause(100);
 			
 			/*
 			 * 1. Pass direction to your snake
@@ -45,14 +71,10 @@ public class Game {
 	 * Clears the screen, draws the snake and food, pauses, and shows the content
 	 */
 	private void updateDrawing() {
-		//FIXME
-		
-		/*
-		 * 1. Clear screen
-		 * 2. Draw snake and food
-		 * 3. Pause (50 ms is good)
-		 * 4. Show
-		 */
+		StdDraw.clear();
+		snake.draw();
+		food.draw();
+		StdDraw.show();
 	}
 	
 	public static void main(String[] args) {
